@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生作业上传系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📚 学生作业上传系统</h1>
+            <p class="subtitle">请认真填写信息并上传作业文件</p>
+        </header>
+
+        <main class="main-content">
+            <form class="upload-form" id="uploadForm">
+                <div class="form-section">
+                    <h2>📝 学生信息</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studentName">姓名 <span class="required">*</span></label>
+                            <input type="text" id="studentName" placeholder="请输入姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentId">学号 <span class="required">*</span></label>
+                            <input type="text" id="studentId" placeholder="请输入学号" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="className">班级 <span class="required">*</span></label>
+                            <select id="className" required>
+                                <option value="">请选择班级</option>
+                                <option value="一年级1班">一年级1班</option>
+                                <option value="一年级2班">一年级2班</option>
+                                <option value="二年级1班">二年级1班</option>
+                                <option value="二年级2班">二年级2班</option>
+                                <option value="三年级1班">三年级1班</option>
+                                <option value="三年级2班">三年级2班</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">科目 <span class="required">*</span></label>
+                            <select id="subject" required>
+                                <option value="">请选择科目</option>
+                                <option value="语文">语文</option>
+                                <option value="数学">数学</option>
+                                <option value="英语">英语</option>
+                                <option value="物理">物理</option>
+                                <option value="化学">化学</option>
+                                <option value="生物">生物</option>
+                                <option value="历史">历史</option>
+                                <option value="地理">地理</option>
+                                <option value="美术">美术</option>
+                                <option value="音乐">音乐</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>📎 作业信息</h2>
+                    <div class="form-group">
+                        <label for="homeworkTitle">作业标题 <span class="required">*</span></label>
+                        <input type="text" id="homeworkTitle" placeholder="例如：第三章课后习题" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">作业说明（选填）</label>
+                        <textarea id="description" placeholder="可以补充说明作业内容或遇到的问题" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>📤 上传文件</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">点击或拖拽文件到这里上传</p>
+                        <p class="upload-hint">支持 PDF、Word、图片等格式，单个文件不超过20MB</p>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.zip,.rar">
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">提交作业</span>
+                    <span class="btn-loading" style="display:none;">提交中...</span>
+                </button>
+            </form>
+        </main>
+
+        <div class="records-section">
+            <h2>📋 我的提交记录</h2>
+            <div class="records-list" id="recordsList">
+                <div class="empty-records">暂无提交记录</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✅</div>
+            <h3>提交成功！</h3>
+            <p>作业已成功上传，老师会尽快查看</p>
+            <button class="modal-btn" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
