@@ -131,7 +131,7 @@ function submitHomework() {
     const homeworkTitle = document.getElementById('homeworkTitle').value.trim();
     const description = document.getElementById('description').value.trim();
 
-    // 验证
+   if (!studentName || !subject || !homeworkTitle) {
     if (!studentName || !studentId || !className || !subject || !homeworkTitle) {
         showToast('请填写所有必填项');
         return;
