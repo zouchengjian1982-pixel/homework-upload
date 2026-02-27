@@ -6,3 +6,4 @@ const SUPABASE_ANON_KEY = 'sb_publishable_nJFN25ZUU9WZTKYO5dCiyQ__emLoYXb';
 
 // 初始化 Supabase 客户端
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
