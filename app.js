@@ -148,17 +148,27 @@ async function submitHomework() {
     submitBtn.querySelector('.btn-loading').style.display = 'inline';
 
     try {
+        // 检查Supabase是否正确初始化
+        console.log('Supabase客户端:', supabase);
+        console.log('Supabase URL:', SUPABASE_URL);
+        
+        if (!supabase || !supabase.storage) {
+            throw new Error('Supabase未正确初始化，请检查配置');
+        }
+        
         const recordId = Date.now();
         const uploadedFiles = [];
 
         // 上传每个文件到 Supabase Storage
         for (let file of uploadFiles) {
-            const filePath = `homework/${recordId}/${file.name}`;
+            const filePath = `${recordId}/${file.name}`;
+            console.log('正在上传文件:', filePath);
             
             const { data, error } = await supabase.storage
                 .from('homework')
                 .upload(filePath, file);
             
+            console.log('上传结果:', { data, error });
             if (error) throw error;
             
             const { data: urlData } = supabase.storage
