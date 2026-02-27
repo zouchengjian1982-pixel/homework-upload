@@ -3,176 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>订单管理后台</title>
+    <title>作业管理后台 - 教师端</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #8B4513, #D2691E); color: #fff; padding: 20px; text-align: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .login-box { max-width: 360px; margin: 100px auto; padding: 40px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .login-box h2 { text-align: center; margin-bottom: 30px; color: #667eea; }
+        .login-box input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 15px; font-size: 14px; }
+        .login-box input:focus { border-color: #667eea; outline: none; }
+        .login-box button { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; }
+        .container { display: none; }
+        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 20px; }
-        .login-box { max-width: 300px; margin: 100px auto; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
-        .login-box h2 { text-align: center; margin-bottom: 20px; color: #8B4513; }
-        .login-box input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
-        .login-box button { width: 100%; padding: 12px; background: #8B4513; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
-        .container { display: none; padding: 15px; }
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #fff; padding: 15px; border-radius: 10px; text-align: center; }
-        .stat-card .num { font-size: 28px; color: #8B4513; font-weight: bold; }
-        .stat-card .label { font-size: 12px; color: #999; margin-top: 5px; }
-        .order-list { background: #fff; border-radius: 10px; }
-        .order-item { padding: 15px; border-bottom: 1px solid #f0f0f0; }
-        .order-item:last-child { border-bottom: none; }
-        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .order-id { font-size: 12px; color: #999; }
-        .order-status { font-size: 12px; padding: 2px 8px; border-radius: 10px; }
-        .status-pending { background: #fff3e0; color: #ff9800; }
-        .status-paid { background: #e8f5e9; color: #4caf50; }
-        .status-shipped { background: #e3f2fd; color: #2196f3; }
-        .order-info { font-size: 14px; margin-bottom: 8px; }
-        .order-info strong { color: #333; }
-        .order-products { font-size: 13px; color: #666; background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 10px 0; }
-        .order-total { font-size: 16px; color: #D2691E; font-weight: bold; }
-        .order-actions { margin-top: 10px; display: flex; gap: 10px; }
-        .order-actions button { padding: 6px 15px; border: none; border-radius: 15px; font-size: 12px; cursor: pointer; }
-        .btn-ship { background: #8B4513; color: #fff; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 20px; border-radius: 20px; cursor: pointer; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px 30px; }
+        .stat-card { background: #fff; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .stat-num { font-size: 36px; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 14px; color: #999; margin-top: 8px; }
+        .filters { padding: 0 30px 20px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .filters select { padding: 10px 20px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .table-container { padding: 0 30px 30px; }
+        table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; font-size: 14px; }
+        td { font-size: 14px; color: #333; }
+        .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 12px; }
+        .status-submitted { background: #e3f2fd; color: #1976d2; }
+        .status-reviewed { background: #e8f5e9; color: #388e3c; }
+        .action-btn { padding: 6px 15px; border: none; border-radius: 15px; font-size: 12px; cursor: pointer; margin-right: 5px; }
+        .btn-view { background: #667eea; color: #fff; }
+        .btn-review { background: #4caf50; color: #fff; }
         .btn-delete { background: #f5f5f5; color: #999; }
-        .empty { text-align: center; padding: 50px; color: #999; }
-        .tabs { display: flex; background: #fff; margin-bottom: 15px; border-radius: 10px; overflow: hidden; }
-        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-size: 14px; }
-        .tab.active { background: #8B4513; color: #fff; }
+        .empty { text-align: center; padding: 60px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 16px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 18px; }
+        .close-btn { font-size: 24px; cursor: pointer; color: #999; }
+        .detail-row { margin-bottom: 15px; }
+        .detail-label { font-size: 12px; color: #999; margin-bottom: 5px; }
+        .detail-value { font-size: 14px; color: #333; }
+        .file-list { margin-top: 15px; }
+        .file-item { display: flex; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; }
+        .file-item span { margin-right: 10px; }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .filters { flex-direction: column; }
+            table { display: block; overflow-x: auto; }
+        }
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <div class="login-box" id="loginBox">
-        <h2>🔐 管理后台</h2>
-        <input type="password" id="password" placeholder="请输入管理密码">
+        <h2>🎓 教师登录</h2>
+        <input type="text" id="username" placeholder="用户名">
+        <input type="password" id="password" placeholder="密码">
         <button onclick="login()">登录</button>
     </div>
 
     <div class="container" id="container">
         <header class="header">
-            <h1>📦 订单管理后台</h1>
+            <h1>📚 作业管理后台</h1>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
         </header>
 
-        <div style="padding: 15px;">
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="num" id="totalOrders">0</div>
-                    <div class="label">总订单</div>
-                </div>
-                <div class="stat-card">
-                    <div class="num" id="totalAmount">0</div>
-                    <div class="label">总金额</div>
-                </div>
-                <div class="stat-card">
-                    <div class="num" id="pendingOrders">0</div>
-                    <div class="label">待处理</div>
-                </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-num" id="totalCount">0</div>
+                <div class="stat-label">总提交数</div>
             </div>
-
-            <div class="tabs">
-                <div class="tab active" onclick="filterOrders('all')">全部</div>
-                <div class="tab" onclick="filterOrders('pending')">待处理</div>
-                <div class="tab" onclick="filterOrders('paid')">已付款</div>
-                <div class="tab" onclick="filterOrders('shipped')">已发货</div>
+            <div class="stat-card">
+                <div class="stat-num" id="todayCount">0</div>
+                <div class="stat-label">今日提交</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-num" id="pendingCount">0</div>
+                <div class="stat-label">待批阅</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="reviewedCount">0</div>
+                <div class="stat-label">已批阅</div>
+            </div>
+        </div>
 
-            <div class="order-list" id="orderList"></div>
+        <div class="filters">
+            <select id="filterClass" onchange="loadHomeworks()">
+                <option value="">全部年级</option>
+                <option value="八年级(1)班">八年级(1)班</option>
+                <option value="八年级(2)班">八年级(2)班</option>
+                <option value="八年级(3)班">八年级(3)班</option>
+                <option value="八年级(4)班">八年级(4)班</option>
+                <option value="八年级(5)班">八年级(5)班</option>
+                <option value="八年级(6)班">八年级(6)班</option>
+                <option value="八年级(7)班">八年级(7)班</option>
+                <option value="八年级(8)班">八年级(8)班</option>
+                <option value="八年级(9)班">八年级(9)班</option>
+                <option value="八年级(10)班">八年级(10)班</option>
+                <option value="八年级(11)班">八年级(11)班</option>
+                <option value="八年级(12)班">八年级(12)班</option>
+            </select>
+            <select id="filterSubject" onchange="loadHomeworks()">
+                <option value="">全部科目</option>
+                <option value="语文">语文</option>
+                <option value="数学">数学</option>
+                <option value="英语">英语</option>
+            </select>
+            <select id="filterStatus" onchange="loadHomeworks()">
+                <option value="">全部状态</option>
+                <option value="submitted">待批阅</option>
+                <option value="reviewed">已批阅</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>学生姓名</th>
+                        <th>年级</th>
+                        <th>科目</th>
+                        <th>作业标题</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="homeworkList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>作业详情</h3>
+                <span class="close-btn" onclick="closeDetail()">×</span>
+            </div>
+            <div id="detailContent"></div>
         </div>
     </div>
 
     <script>
-        const ADMIN_PASSWORD = '123456';
-        let orders = [];
-        let currentFilter = 'all';
+        const ADMIN_USER = 'teacher';
+        const ADMIN_PASS = '123456';
 
         function login() {
-            const pwd = document.getElementById('password').value;
-            if (pwd === ADMIN_PASSWORD) {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
                 document.getElementById('loginBox').style.display = 'none';
                 document.getElementById('container').style.display = 'block';
-                loadOrders();
+                loadHomeworks();
             } else {
-                alert('密码错误');
+                alert('用户名或密码错误');
             }
         }
 
-        function loadOrders() {
-            orders = JSON.parse(localStorage.getItem('shuhua_orders')) || [];
-            updateStats();
-            renderOrders();
+        function logout() {
+            document.getElementById('loginBox').style.display = 'block';
+            document.getElementById('container').style.display = 'none';
         }
 
-        function updateStats() {
-            document.getElementById('totalOrders').textContent = orders.length;
-            const total = orders.reduce((sum, o) => sum + o.total, 0);
-            document.getElementById('totalAmount').textContent = '¥' + total;
-            const pending = orders.filter(o => o.status === 'pending').length;
-            document.getElementById('pendingOrders').textContent = pending;
-        }
-
-        function filterOrders(status) {
-            currentFilter = status;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderOrders();
-        }
-
-        function renderOrders() {
-            const list = document.getElementById('orderList');
-            let filtered = currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter);
+        async function loadHomeworks() {
+            let records = [];
             
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="empty">暂无订单</div>';
+            // 尝试从Supabase加载
+            try {
+                if (typeof supabase !== 'undefined') {
+                    const { data, error } = await supabase
+                        .from('homework')
+                        .select('*')
+                        .order('createdAt', { ascending: false });
+                    
+                    if (!error && data) {
+                        records = data;
+                        localStorage.setItem('homework_records', JSON.stringify(records));
+                    }
+                }
+            } catch (e) {
+                console.log('从Supabase加载失败，使用本地数据:', e);
+                records = JSON.parse(localStorage.getItem('homework_records')) || [];
+            }
+            
+            if (records.length === 0) {
+                records = JSON.parse(localStorage.getItem('homework_records')) || [];
+            }
+            const filterClass = document.getElementById('filterClass').value;
+            const filterSubject = document.getElementById('filterSubject').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            if (filterClass) records = records.filter(r => r.className === filterClass);
+            if (filterSubject) records = records.filter(r => r.subject === filterSubject);
+            if (filterStatus) records = records.filter(r => r.status === filterStatus);
+
+            // 统计
+            const all = JSON.parse(localStorage.getItem('homework_records')) || [];
+            document.getElementById('totalCount').textContent = all.length;
+            const today = new Date().toLocaleDateString();
+            document.getElementById('todayCount').textContent = all.filter(r => r.submitTime.includes(today.replace(/\//g, '/'))).length;
+            document.getElementById('pendingCount').textContent = all.filter(r => r.status === 'submitted').length;
+            document.getElementById('reviewedCount').textContent = all.filter(r => r.status === 'reviewed').length;
+
+            const tbody = document.getElementById('homeworkList');
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">暂无作业记录</td></tr>';
                 return;
             }
 
-            list.innerHTML = filtered.map((order, index) => `
-                <div class="order-item">
-                    <div class="order-header">
-                        <span class="order-id">订单号: ${order.id}</span>
-                        <span class="order-status status-${order.status}">
-                            ${order.status === 'pending' ? '待处理' : order.status === 'paid' ? '已付款' : '已发货'}
-                        </span>
-                    </div>
-                    <div class="order-info">
-                        <strong>收件人:</strong> ${order.receiver.name} | ${order.receiver.phone}
-                    </div>
-                    <div class="order-info">
-                        <strong>地址:</strong> ${order.receiver.address}
-                    </div>
-                    ${order.receiver.remark ? `<div class="order-info"><strong>备注:</strong> ${order.receiver.remark}</div>` : ''}
-                    <div class="order-products">
-                        ${order.items.map(item => `${item.name} x${item.quantity}`).join('、')}
-                    </div>
-                    <div class="order-total">合计: ¥${order.total}</div>
-                    <div class="order-info" style="font-size:12px;color:#999;">下单时间: ${order.time}</div>
-                    <div class="order-actions">
-                        ${order.status !== 'shipped' ? `<button class="btn-ship" onclick="shipOrder(${index})">标记发货</button>` : ''}
-                        <button class="btn-delete" onclick="deleteOrder(${index})">删除</button>
-                    </div>
-                </div>
+            tbody.innerHTML = records.map((r, i) => `
+                <tr>
+                    <td>${r.studentName}</td>
+                    <td>${r.className}</td>
+                    <td>${r.subject}</td>
+                    <td>${r.homeworkTitle}</td>
+                    <td>${r.submitTime}</td>
+                    <td><span class="status-badge ${r.status === 'reviewed' ? 'status-reviewed' : 'status-submitted'}">${r.status === 'reviewed' ? '已批阅' : '待批阅'}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewDetail(${r.id})">查看</button>
+                        ${r.status !== 'reviewed' ? `<button class="action-btn btn-review" onclick="markReviewed(${r.id})">批阅</button>` : ''}
+                        <button class="action-btn btn-delete" onclick="deleteRecord(${r.id})">删除</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        function shipOrder(index) {
-            orders[index].status = 'shipped';
-            localStorage.setItem('shuhua_orders', JSON.stringify(orders));
-            updateStats();
-            renderOrders();
+        function viewDetail(id) {
+            const records = JSON.parse(localStorage.getItem('homework_records')) || [];
+            const r = records.find(x => x.id === id);
+            if (!r) return;
+
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-row"><div class="detail-label">学生姓名</div><div class="detail-value">${r.studentName}</div></div>
+                <div class="detail-row"><div class="detail-label">年级</div><div class="detail-value">${r.className}</div></div>
+                <div class="detail-row"><div class="detail-label">科目</div><div class="detail-value">${r.subject}</div></div>
+                <div class="detail-row"><div class="detail-label">作业标题</div><div class="detail-value">${r.homeworkTitle}</div></div>
+                <div class="detail-row"><div class="detail-label">说明</div><div class="detail-value">${r.description || '无'}</div></div>
+                <div class="detail-row"><div class="detail-label">提交时间</div><div class="detail-value">${r.submitTime}</div></div>
+                <div class="detail-row"><div class="detail-label">附件 (${r.files.length}个)</div>
+                    <div class="file-list">${r.files.map(f => `<div class="file-item"><span>📎</span>${f.name}${f.url ? `<a href="${f.url}" target="_blank" style="margin-left:auto;color:#667eea;">下载</a>` : ''}</div>`).join('')}</div>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('show');
         }
 
-        function deleteOrder(index) {
-            if (confirm('确定删除此订单？')) {
-                orders.splice(index, 1);
-                localStorage.setItem('shuhua_orders', JSON.stringify(orders));
-                updateStats();
-                renderOrders();
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        async function markReviewed(id) {
+            let records = JSON.parse(localStorage.getItem('homework_records')) || [];
+            const r = records.find(x => x.id === id);
+            if (r) {
+                r.status = 'reviewed';
+                localStorage.setItem('homework_records', JSON.stringify(records));
+                
+                // 同步到Supabase
+                try {
+                    if (typeof supabase !== 'undefined') {
+                        await supabase
+                            .from('homework')
+                            .update({ status: 'reviewed' })
+                            .eq('id', id);
+                    }
+                } catch (e) {
+                    console.log('Supabase更新失败:', e);
+                }
+                
+                loadHomeworks();
             }
         }
 
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') login();
-        });
+        async function deleteRecord(id) {
+            if (!confirm('确定删除此记录？')) return;
+            let records = JSON.parse(localStorage.getItem('homework_records')) || [];
+            records = records.filter(x => x.id !== id);
+            localStorage.setItem('homework_records', JSON.stringify(records));
+            
+            // 从Supabase删除
+            try {
+                if (typeof supabase !== 'undefined') {
+                    await supabase
+                        .from('homework')
+                        .delete()
+                        .eq('id', id);
+                }
+            } catch (e) {
+                console.log('Supabase删除失败:', e);
+            }
+            
+            loadHomeworks();
+        }
+
+        document.getElementById('password').onkeypress = e => { if(e.key==='Enter') login(); };
     </script>
 </body>
 </html>
