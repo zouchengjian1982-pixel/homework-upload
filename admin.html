@@ -172,8 +172,8 @@
             
             // 尝试从Supabase加载
             try {
-                if (typeof supabase !== 'undefined') {
-                    const { data, error } = await supabase
+                if (typeof supabaseClient !== 'undefined') {
+                    const { data, error } = await supabaseClient
                         .from('homework')
                         .select('*')
                         .order('createdAt', { ascending: false });
@@ -262,8 +262,8 @@
                 
                 // 同步到Supabase
                 try {
-                    if (typeof supabase !== 'undefined') {
-                        await supabase
+                    if (typeof supabaseClient !== 'undefined') {
+                        await supabaseClient
                             .from('homework')
                             .update({ status: 'reviewed' })
                             .eq('id', id);
@@ -284,8 +284,8 @@
             
             // 从Supabase删除
             try {
-                if (typeof supabase !== 'undefined') {
-                    await supabase
+                if (typeof supabaseClient !== 'undefined') {
+                    await supabaseClient
                         .from('homework')
                         .delete()
                         .eq('id', id);
