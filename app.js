@@ -123,16 +123,15 @@ function initForm() {
 }
 
 // 提交作业
-function submitHomework() {
+async function submitHomework() {
     const studentName = document.getElementById('studentName').value.trim();
-    const studentId = document.getElementById('studentId').value.trim();
     const className = document.getElementById('className').value;
     const subject = document.getElementById('subject').value;
     const homeworkTitle = document.getElementById('homeworkTitle').value.trim();
     const description = document.getElementById('description').value.trim();
 
-   if (!studentName || !subject || !homeworkTitle) {
-    if (!studentName || !studentId || !className || !subject || !homeworkTitle) {
+    // 验证
+    if (!studentName || !subject || !homeworkTitle) {
         showToast('请填写所有必填项');
         return;
     }
@@ -142,27 +141,59 @@ function submitHomework() {
         return;
     }
 
-    // 模拟提交
+    // 显示提交中状态
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
     submitBtn.querySelector('.btn-text').style.display = 'none';
     submitBtn.querySelector('.btn-loading').style.display = 'inline';
 
-    setTimeout(() => {
-        // 保存记录
+    try {
+        const recordId = Date.now();
+        const uploadedFiles = [];
+
+        // 上传每个文件到 Supabase Storage
+        for (let file of uploadFiles) {
+            const filePath = `homework/${recordId}/${file.name}`;
+            
+            const { data, error } = await supabase.storage
+                .from('homework')
+                .upload(filePath, file);
+            
+            if (error) throw error;
+            
+            const { data: urlData } = supabase.storage
+                .from('homework')
+                .getPublicUrl(filePath);
+            
+            uploadedFiles.push({
+                name: file.name,
+                size: file.size,
+                url: urlData.publicUrl,
+                path: filePath
+            });
+        }
+
+        // 保存记录到 Supabase 数据库
         const record = {
-            id: Date.now(),
+            id: recordId,
             studentName,
-            studentId,
             className,
             subject,
             homeworkTitle,
             description,
-            files: uploadFiles.map(f => ({ name: f.name, size: f.size })),
+            files: uploadedFiles,
             submitTime: new Date().toLocaleString(),
+            createdAt: new Date().toISOString(),
             status: 'submitted'
         };
 
+        const { error: dbError } = await supabase
+            .from('homework')
+            .insert([record]);
+        
+        if (dbError) throw dbError;
+
+        // 同时保存到 localStorage（本地缓存）
         let records = JSON.parse(localStorage.getItem('homework_records')) || [];
         records.unshift(record);
         localStorage.setItem('homework_records', JSON.stringify(records));
@@ -173,14 +204,18 @@ function submitHomework() {
         renderFileList();
         loadRecords();
 
+        // 显示成功弹窗
+        document.getElementById('successModal').classList.add('show');
+
+    } catch (error) {
+        console.error('上传失败:', error);
+        showToast('上传失败，请重试: ' + error.message);
+    } finally {
         // 恢复按钮
         submitBtn.disabled = false;
         submitBtn.querySelector('.btn-text').style.display = 'inline';
         submitBtn.querySelector('.btn-loading').style.display = 'none';
-
-        // 显示成功弹窗
-        document.getElementById('successModal').classList.add('show');
-    }, 1500);
+    }
 }
 
 // 关闭弹窗
