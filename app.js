@@ -149,10 +149,10 @@ async function submitHomework() {
 
     try {
         // 检查Supabase是否正确初始化
-        console.log('Supabase客户端:', supabase);
+        console.log('Supabase客户端:', supabaseClient);
         console.log('Supabase URL:', SUPABASE_URL);
         
-        if (!supabase || !supabase.storage) {
+        if (!supabaseClient || !supabaseClient.storage) {
             throw new Error('Supabase未正确初始化，请检查配置');
         }
         
@@ -164,14 +164,14 @@ async function submitHomework() {
             const filePath = `${recordId}/${file.name}`;
             console.log('正在上传文件:', filePath);
             
-            const { data, error } = await supabase.storage
+            const { data, error } = await supabaseClient.storage
                 .from('homework')
                 .upload(filePath, file);
             
             console.log('上传结果:', { data, error });
             if (error) throw error;
             
-            const { data: urlData } = supabase.storage
+            const { data: urlData } = supabaseClient.storage
                 .from('homework')
                 .getPublicUrl(filePath);
             
@@ -197,7 +197,7 @@ async function submitHomework() {
             status: 'submitted'
         };
 
-        const { error: dbError } = await supabase
+        const { error: dbError } = await supabaseClient
             .from('homework')
             .insert([record]);
         
